@@ -21,7 +21,7 @@ const SOUND_DEFAULTS = {
 }
 const buildCatConf = () => {
   const o = {}
-  for (const k of CAT_KEYS) o[k] = { notify: k !== 'manual', sound: SOUND_DEFAULTS[k] || 'chime', file: '', fileName: '', url: '', volume: 1 }
+  for (const k of CAT_KEYS) o[k] = { notify: k !== 'manual', soundOn: k !== 'manual', sound: SOUND_DEFAULTS[k] || 'chime', file: '', fileName: '', url: '', volume: 1 }
   return o
 }
 const DEFAULTS = {
@@ -46,6 +46,8 @@ function loadSettings() {
             for (const kk of Object.keys(b)) {
               if (s[kk] && typeof s[kk] === 'object') {
                 const merged = Object.assign({}, b[kk], s[kk])
+                // migrate: old data had no soundOn; sound was gated by notify
+                if (typeof s[kk].soundOn !== 'boolean') merged.soundOn = merged.notify !== false
                 if (typeof merged.volume !== 'number' || !isFinite(merged.volume) || merged.volume > 1) merged.volume = 1
                 b[kk] = merged
               }
@@ -283,7 +285,7 @@ const handleItem = (item) => {
   const key = categoryOf(item)
   const conf = settings.catConf && settings.catConf[key]
   if (item.kind !== 'test') {
-    if (!conf || conf.notify === false) return
+    if (!conf || (conf.notify === false && conf.soundOn === false)) return
   }
   // Cooldown only guards completion-style events (对话/子任务/Workflow/后台任务).
   // Stop reasons (手动/报错/超长/阻塞/其他) and approval are deliberate, meaningful
@@ -297,8 +299,8 @@ const handleItem = (item) => {
   lastNotifyAt = Date.now()
   history.push({ kind: item.kind, title: item.title, body: item.body, at: item.at || Date.now() })
   if (history.length > 20) history.shift()
-  if (settings.notif) showNotification(item.title, item.body)
-  if (settings.sound) {
+  if (settings.notif && (!conf || conf.notify !== false)) showNotification(item.title, item.body)
+  if (settings.sound && (!conf || conf.soundOn !== false)) {
     if (conf) playCat(conf)
     else playTone('chime', 1)
   }
@@ -627,6 +629,7 @@ function apply(ctx) {
     const clearFile = () => { apply({ file: '', fileName: '', sound: 'chime' }); setMsg('') }
     const preview = () => { playCat(conf) }
     const vol = volOf(conf.volume)
+    const masterOn = !!(conf.notify || conf.soundOn)
     return React.createElement('div', { className: 'dsh-cn-cat' },
       React.createElement('div', {
         className: 'dsh-cn-cat-head',
@@ -641,13 +644,23 @@ function apply(ctx) {
         ),
         React.createElement('div', { className: 'dsh-cn-set-ctl' },
           React.createElement('span', { className: 'dsh-cn-cat-summary' }, '音效: ' + soundSummary(conf) + ' · ' + Math.round(vol * 100) + '%'),
+          React.createElement('span', { className: 'dsh-cn-caption' }, '总开关'),
           React.createElement('span', { className: 'dsh-cn-cat-chevron' + (open ? ' open' : '') },
             React.createElement(ChevronIcon, null)
           ),
-          React.createElement(Toggle, { on: conf.notify, label: label + ' 通知开关', onChange: (v) => apply({ notify: v }) })
+          React.createElement(Toggle, { on: masterOn, label: label + ' 总开关', onChange: (v) => apply({ notify: v, soundOn: v }) })
         )
       ),
       open && React.createElement('div', { className: 'dsh-cn-cat-body' },
+        React.createElement('div', { className: 'dsh-cn-set-row' },
+          React.createElement('div', { className: 'dsh-cn-set-label' }, '浏览器通知 / 音效'),
+          React.createElement('div', { className: 'dsh-cn-set-ctl' },
+            React.createElement('span', { className: 'dsh-cn-caption' }, '浏览器通知'),
+            React.createElement(Toggle, { on: !!conf.notify, label: label + ' 浏览器通知开关', onChange: (v) => apply({ notify: v }) }),
+            React.createElement('span', { className: 'dsh-cn-caption', style: { marginLeft: 6 } }, '音效'),
+            React.createElement(Toggle, { on: !!conf.soundOn, label: label + ' 音效开关', onChange: (v) => apply({ soundOn: v }) })
+          )
+        ),
         React.createElement('div', { className: 'dsh-cn-set-row' },
           React.createElement('div', { className: 'dsh-cn-set-label' }, '音效类型'),
           React.createElement(DSelect, {

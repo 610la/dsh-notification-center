@@ -987,7 +987,7 @@ const CSS = [
   '.dsh-cn-set-title{font-size:15px;font-weight:600;line-height:1.4;color:var(--dsw-alias-label-primary,#222);}',
   '.dsh-cn-set-sub{font-size:13px;line-height:1.5;color:var(--dsw-alias-label-tertiary,#999);margin-top:2px;}',
   '.dsh-cn-set-group{border:1px solid var(--dsw-alias-border-l2,rgba(128,128,128,.45));border-radius:12px;padding:4px;background:var(--dsw-alias-bg-base,transparent);}',
-  '.dsh-cn-set-group-title{font-size:13px;font-weight:600;line-height:1.5;color:var(--dsw-alias-label-primary,#222);padding:10px 10px 4px;}',
+  '.dsh-cn-set-group-title{font-size:12px;font-weight:600;line-height:1.5;color:var(--dsw-alias-label-secondary,#888);padding:10px 10px 4px;}',
   '.dsh-cn-set-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 10px;border-radius:8px;}',
   '.dsh-cn-set-row:hover{background:var(--dsw-alias-bg-layer-1,rgba(128,128,128,.05));}',
   '.dsh-cn-set-label{font-size:13px;line-height:1.5;color:var(--dsw-alias-label-primary,#222);display:flex;flex-direction:column;gap:2px;min-width:0;}',

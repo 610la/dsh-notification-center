@@ -28,7 +28,8 @@
     "@deepseek-ai/dsh-client-connection": ">=0.1.0"
   },
   "files": [
-    "lib"
+    "lib",
+    "README.en.md"
   ],
   "scripts": {
     "build": "node scripts/build.mjs",

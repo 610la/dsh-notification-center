@@ -486,7 +486,6 @@ function apply(ctx) {
     const [testCd, setTestCd] = React.useState(0)
     const rerender = () => force((x) => x + 1)
     React.useEffect(() => subscribeSettings(rerender), [])
-    if (settings.showBell === false) return null
     React.useEffect(() => {
       if (testCd <= 0) return
       const stop = ctx.interval(() => setTestCd((c) => c - 1), 1000)
@@ -574,6 +573,7 @@ function apply(ctx) {
       const cls = state.status.indexOf('✗') === 0 ? 'err' : state.status.indexOf('✓') === 0 ? 'ok' : 'warn'
       rows.push(React.createElement('div', { key: 'st', className: 'dsh-cn-status ' + cls }, state.status))
     }
+    if (settings.showBell === false) return null
     return React.createElement('div', { className: 'dsh-cn-wrap' },
       React.createElement('button', {
         className: 'dsh-cn-bell',

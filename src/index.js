@@ -100,6 +100,24 @@ export default {
       push(sid, 'subagent', '子任务完成', '子代理 ' + String(info.provider || 'subagent') + ' · ' + String(reason))
     })
 
+    // Workflow run settled — attribute to the initiating (parent) agent when one
+    // is live; otherwise drop it (covered by the subsequent turn/end completion).
+    ctx.on('workflow/end', (info, result) => {
+      if (!info) return
+      let sid = ''
+      try {
+        const agents = ctx.get('agents')
+        if (agents && typeof agents.currentInitiator === 'function') {
+          const initiator = agents.currentInitiator()
+          if (initiator && initiator.id) sid = String(initiator.id)
+        }
+      } catch (_) { /* keep fallback */ }
+      if (!sid) return
+      const name = info.meta && info.meta.name ? String(info.meta.name) : 'workflow'
+      const reason = result && result.stopReason ? String(result.stopReason) : 'settled'
+      push(sid, 'workflow', '任务完成 · Workflow', name + ' · ' + reason)
+    })
+
     // Background job settled.
     const jobs = ctx.get('jobs')
     if (jobs && typeof jobs.onJobDone === 'function') {
@@ -134,9 +152,5 @@ export default {
         }
       }
     }))
-
-    // Note: workflow/end is not recorded here — the payload carries no session
-    // identity, and the foreground workflow tool's completion is covered by the
-    // following turn/end ('completed') notification.
   }
 }

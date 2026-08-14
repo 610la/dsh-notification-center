@@ -1,0 +1,15 @@
+# deps
+node_modules/
+
+# build artifacts (rebuilt by `npm run build` / prepublishOnly)
+lib/
+
+# npm tarballs
+*.tgz
+
+# credentials — never commit tokens
+.npmrc
+
+# OS / editor
+.DS_Store
+Thumbs.db

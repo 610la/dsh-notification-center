@@ -617,7 +617,7 @@ function apply(ctx) {
     ))
     if (!IS_PACKAGED) {
       rows.push(React.createElement('div', { key: 'r3', className: 'dsh-cn-row' },
-        React.createElement('span', null, '通知权限: ' + permText),
+        React.createElement('span', null, '浏览器通知权限: ' + permText),
         React.createElement('button', { className: 'dsh-cn-mini', onClick: (e) => { e.stopPropagation(); grant() } }, '授权')
       ))
     }
@@ -856,7 +856,7 @@ function apply(ctx) {
         React.createElement(Row, { label: '完成音效', hint: '总开关' },
           React.createElement(Toggle, { on: settings.sound, label: '完成音效', onChange: (v) => set({ sound: v }) })
         ),
-        !IS_PACKAGED && React.createElement(Row, { label: '通知权限', hint: '当前: ' + permText },
+        !IS_PACKAGED && React.createElement(Row, { label: '浏览器通知权限', hint: '当前: ' + permText },
           React.createElement('button', { className: 'dsh-cn-mini', onClick: grant }, '授权')
         ),
         React.createElement(Row, { label: NOTIF_LABEL + '测试', hint: testMsg || '发送一条测试通知并播放对话音效' },
@@ -989,7 +989,7 @@ const CSS = [
   '.dsh-cn-set-group-title{font-size:13px;font-weight:600;line-height:1.5;color:var(--dsw-alias-label-primary,#222);padding:10px 10px 4px;}',
   '.dsh-cn-set-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:8px 10px;border-radius:8px;}',
   '.dsh-cn-set-row:hover{background:var(--dsw-alias-bg-layer-1,rgba(128,128,128,.05));}',
-  '.dsh-cn-set-label{font-size:13px;font-weight:500;line-height:1.5;color:var(--dsw-alias-label-primary,#222);display:flex;flex-direction:column;gap:2px;min-width:0;}',
+  '.dsh-cn-set-label{font-size:13px;line-height:1.5;color:var(--dsw-alias-label-primary,#222);display:flex;flex-direction:column;gap:2px;min-width:0;}',
   '.dsh-cn-set-hint{font-size:12px;line-height:1.5;color:var(--dsw-alias-label-tertiary,#999);}',
   '.dsh-cn-set-ctl{display:flex;align-items:center;gap:8px;flex:none;}',
   '.dsh-cn-cat{display:flex;flex-direction:column;}',

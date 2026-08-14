@@ -1,6 +1,6 @@
 {
   "name": "@lyhalal/dsh-notification-center",
-  "version": "0.1.29",
+  "version": "0.1.30",
   "description": "通知中心：对话/任务完成、报错、等待批准等事件触发浏览器通知 + 21 种匹配音效，每类事件独立配置（音效/文件/URL/音量/开关）。",
   "license": "MIT",
   "type": "module",

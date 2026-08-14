@@ -133,7 +133,7 @@ export default {
     // GET /dsh-notification-center/poll?session=<sessionId>&after=<lastId>
     ctx.effect(() => ctx.webServer.register({
       kind: 'prefix',
-      path: '/dsh-notification-center/',
+      path: '/dsh-notification-center',
       handler: (req, res) => {
         try {
           const url = new URL(req.url || '/', 'http://localhost')

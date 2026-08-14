@@ -285,7 +285,12 @@ const handleItem = (item) => {
   if (item.kind !== 'test') {
     if (!conf || conf.notify === false) return
   }
-  if (item.kind !== 'test' && item.kind !== 'approval') {
+  // Cooldown only guards completion-style events (对话/子任务/Workflow/后台任务).
+  // Stop reasons (手动/报错/超长/阻塞/其他) and approval are deliberate, meaningful
+  // events and always notify — a manual stop right after a completion must not be
+  // silently dropped by the cooldown.
+  const COOLDOWN_EXEMPT = ['approval', 'test', 'error', 'max-tokens', 'blocked', 'other', 'manual']
+  if (COOLDOWN_EXEMPT.indexOf(key) === -1) {
     const now = Date.now()
     if (now - lastNotifyAt < (Number(settings.cooldownMs) || 0)) return
   }

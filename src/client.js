@@ -804,6 +804,8 @@ function apply(ctx) {
       let status = 'off'
       if (settings.notif) {
         status = IS_PACKAGED ? nativeNotify('通知中心测试', '来自通知插件的测试通知') : showNotification('通知中心测试', '来自通知插件的测试通知')
+        history.push({ kind: 'test', title: '通知中心测试', body: '手动测试', at: Date.now() })
+        if (history.length > 20) history.shift()
       }
       const map = {
         granted: '✓ 通知已发送',

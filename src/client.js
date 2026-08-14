@@ -267,40 +267,10 @@ const showNotification = (title, body) => {
 }
 
 // Packaged-shell detection: Electron / Tauri renderers have no browser address
-// bar and (as in deepseek-harness-desktop) may hard-deny the HTML5 Notification
-// permission, so the plugin falls back to an in-app toast.
+// bar and may hard-deny the HTML5 Notification permission (e.g. deepseek-harness-desktop).
 const IS_ELECTRON = typeof navigator !== 'undefined' && /Electron/i.test(navigator.userAgent)
 const IS_TAURI = typeof window !== 'undefined' && !!(window.__TAURI__ || window.__TAURI_INTERNALS__)
 const IS_PACKAGED = IS_ELECTRON || IS_TAURI
-
-// In-app toast fallback: works in every shell regardless of system notification
-// permission. Stacks up to 5, auto-dismisses after 5s, click to dismiss.
-const showToast = (title, body) => {
-  try {
-    let wrap = document.getElementById('dsh-cn-toast')
-    if (!wrap) {
-      wrap = document.createElement('div')
-      wrap.id = 'dsh-cn-toast'
-      document.body.appendChild(wrap)
-    }
-    const toast = document.createElement('div')
-    toast.className = 'dsh-cn-toast-item'
-    const t = document.createElement('div')
-    t.className = 'dsh-cn-toast-title'
-    t.textContent = String(title || '')
-    toast.appendChild(t)
-    if (body) {
-      const b = document.createElement('div')
-      b.className = 'dsh-cn-toast-body'
-      b.textContent = String(body)
-      toast.appendChild(b)
-    }
-    toast.addEventListener('click', () => { if (toast.parentNode) toast.parentNode.removeChild(toast) })
-    wrap.appendChild(toast)
-    setTimeout(() => { if (toast.parentNode) toast.parentNode.removeChild(toast) }, 5000)
-    while (wrap.children.length > 5) wrap.removeChild(wrap.firstChild)
-  } catch (_) { /* ignore */ }
-}
 
 const KIND_LABEL = { turn: '对话', subagent: '子任务', workflow: 'Workflow', job: '后台任务', approval: '批准', test: '测试' }
 const stopKeyOf = (item) => {
@@ -335,10 +305,7 @@ const handleItem = (item) => {
   lastNotifyAt = Date.now()
   history.push({ kind: item.kind, title: item.title, body: item.body, at: item.at || Date.now() })
   if (history.length > 20) history.shift()
-  if (settings.notif && (!conf || conf.notify !== false)) {
-    const st = showNotification(item.title, item.body)
-    if (st !== 'granted' && st !== 'requested') showToast(item.title, item.body)
-  }
+  if (settings.notif && (!conf || conf.notify !== false)) showNotification(item.title, item.body)
   if (settings.sound && (!conf || conf.soundOn !== false)) {
     if (conf) playCat(conf)
     else playTone('chime', 1)
@@ -557,10 +524,10 @@ function apply(ctx) {
     }, [state.open])
     const setStatus = (s) => { state.status = s; rerender() }
     const grant = () => {
-      if (!('Notification' in window)) { setStatus(IS_PACKAGED ? '当前环境不支持网页系统通知，已自动改用应用内提示' : '当前浏览器不支持系统通知'); return }
+      if (!('Notification' in window)) { setStatus(IS_PACKAGED ? '当前环境不支持网页系统通知' : '当前浏览器不支持系统通知'); return }
       Notification.requestPermission().then((p) => {
         if (p === 'granted') setStatus('✓ 通知权限已开启')
-        else if (p === 'denied') setStatus(IS_PACKAGED ? '✗ 该桌面应用禁用了网页通知：请在系统设置/应用设置中开启通知权限（已自动改用应用内提示）' : '✗ 已被拒绝，请点击浏览器地址栏左侧图标手动允许')
+        else if (p === 'denied') setStatus(IS_PACKAGED ? '✗ 该桌面应用禁用了网页通知：请在系统设置/应用设置中开启通知权限' : '✗ 已被拒绝，请点击浏览器地址栏左侧图标手动允许')
         else setStatus('未授权')
       }).catch(() => { setStatus('授权请求失败') })
     }
@@ -576,14 +543,13 @@ function apply(ctx) {
       if (settings.notif) {
         status = showNotification('通知中心测试', '来自通知插件的测试')
         history.push({ kind: 'test', title: '通知中心测试', body: '手动测试', at: Date.now() })
-        if (status !== 'granted' && status !== 'requested') showToast('通知中心测试', '来自通知插件的测试')
       }
       const map = {
         granted: '✓ 通知已发送，音效已播放',
         requested: '已请求通知权限，请在浏览器弹窗中点击允许；音效已播放',
-        denied: IS_PACKAGED ? '✗ 系统通知被应用禁用，已改用应用内提示（音效已播放）' : '✗ 通知被浏览器拒绝（音效已播放）；请点击上方「授权」或修改站点设置',
-        unsupported: '当前环境不支持系统通知，已改用应用内提示（音效已播放）',
-        error: '通知发送失败，已改用应用内提示（音效已播放）',
+        denied: IS_PACKAGED ? '✗ 系统通知被应用禁用（音效已播放）：请在该桌面应用的设置里开启通知权限' : '✗ 通知被浏览器拒绝（音效已播放）；请点击上方「授权」或修改站点设置',
+        unsupported: '当前环境不支持系统通知（音效已播放）',
+        error: '通知发送失败（音效已播放）',
         off: '通知已关闭（音效已播放）'
       }
       setStatus(map[status] || status)
@@ -786,14 +752,13 @@ function apply(ctx) {
       let status = 'off'
       if (settings.notif) {
         status = showNotification('通知中心测试', '来自通知插件的测试通知')
-        if (status !== 'granted' && status !== 'requested') showToast('通知中心测试', '来自通知插件的测试通知')
       }
       const map = {
         granted: '✓ 通知已发送',
         requested: '已请求权限，请在浏览器弹窗中允许',
-        denied: IS_PACKAGED ? '✗ 系统通知被应用禁用，已改用应用内提示' : '✗ 通知被浏览器拒绝，点击「授权」或修改站点设置',
-        unsupported: '当前环境不支持系统通知，已改用应用内提示',
-        error: '通知发送失败，已改用应用内提示',
+        denied: IS_PACKAGED ? '✗ 系统通知被应用禁用：请在该桌面应用的设置里开启通知权限' : '✗ 通知被浏览器拒绝，点击「授权」或修改站点设置',
+        unsupported: '当前环境不支持系统通知',
+        error: '通知发送失败',
         off: '「浏览器通知」总开关已关闭'
       }
       setTestMsg(map[status] || status)
@@ -801,7 +766,7 @@ function apply(ctx) {
     }
     const permText = !('Notification' in window) ? '不支持'
       : Notification.permission === 'granted' ? '已开启'
-      : Notification.permission === 'denied' ? (IS_PACKAGED ? '已禁用(应用内提示)' : '已拒绝')
+      : Notification.permission === 'denied' ? (IS_PACKAGED ? '已禁用' : '已拒绝')
       : '未授权'
     const cooldownOptions = [
       [0, '无'], [2000, '2 秒'], [5000, '5 秒'], [10000, '10 秒'], [30000, '30 秒']
@@ -983,10 +948,5 @@ const CSS = [
   '.dsh-cn-history-item{display:flex;align-items:baseline;gap:8px;font-size:12px;color:var(--dsw-alias-label-primary,#222);padding:3px 0;}',
   '.dsh-cn-history-item .t{color:var(--dsw-alias-label-secondary,#888);flex:none;font-size:11px;}',
   '.dsh-cn-history-item .k{flex:none;color:var(--dsw-alias-brand-primary,#3b82f6);font-size:11px;}',
-  '.dsh-cn-empty{font-size:12px;color:var(--dsw-alias-label-secondary,#888);padding:4px 10px 8px;}',
-  '#dsh-cn-toast{position:fixed;top:16px;right:16px;z-index:2147483000;display:flex;flex-direction:column;gap:8px;pointer-events:none;max-width:340px;}',
-  '.dsh-cn-toast-item{pointer-events:auto;padding:10px 14px;border:1px solid var(--dsw-alias-border-l1,rgba(128,128,128,.3));border-radius:12px;background:var(--dsw-alias-bg-layer-2,#fff);box-shadow:var(--dsw-shadow-lv3,0 8px 24px rgba(0,0,0,.14));cursor:pointer;animation:dsh-cn-toast-in .18s ease-out;}',
-  '.dsh-cn-toast-title{font-size:13px;font-weight:600;color:var(--dsw-alias-label-primary,#222);}',
-  '.dsh-cn-toast-body{font-size:12px;color:var(--dsw-alias-label-secondary,#666);margin-top:2px;line-height:1.5;word-break:break-word;}',
-  '@keyframes dsh-cn-toast-in{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}'
+  '.dsh-cn-empty{font-size:12px;color:var(--dsw-alias-label-secondary,#888);padding:4px 10px 8px;}'
 ].join('')

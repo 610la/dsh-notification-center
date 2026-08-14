@@ -943,7 +943,8 @@ function apply(ctx) {
 }
 
 const CSS = [
-  '.dsh-cn-wrap{position:relative;display:inline-flex;align-items:center;margin-right:2px;}',
+  '.dsh-cn-wrap{position:relative;display:inline-flex;align-items:center;margin-right:2px;font-family:var(--dsw-font-family,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",Helvetica,Arial,sans-serif);}',
+  '.dsh-cn-wrap button,.dsh-cn-set button,.dsh-cn-menu button{font-family:inherit;}',
   '.dsh-cn-bell{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;padding:0;border:1px solid transparent;border-radius:8px;background:transparent;color:var(--dsw-alias-label-secondary,#666);cursor:pointer;transition:background .12s,color .12s;}',
   '.dsh-cn-bell:hover{background:var(--dsw-alias-bg-layer-1,rgba(128,128,128,.1));color:var(--dsw-alias-label-primary,#222);}',
   '.dsh-cn-menu{position:absolute;bottom:calc(100% + 8px);left:0;z-index:60;min-width:236px;padding:6px;border:1px solid var(--dsw-alias-border-l2,rgba(128,128,128,.45));border-radius:12px;background:var(--dsw-alias-bg-layer-2,#fff);box-shadow:var(--dsw-shadow-lv3,0 8px 24px rgba(0,0,0,.12));display:flex;flex-direction:column;gap:1px;font-family:inherit;}',

@@ -284,6 +284,36 @@ const nativeNotify = (title, body) => {
   } catch (_) { return 'error' }
 }
 
+// Open the shell's settings panel and navigate to our "通知中心" section.
+// The shell keeps the open/active section as component-local state with no
+// public API, so this drives the DOM: click the settings trigger, then the nav cell.
+const openFullSettings = () => {
+  try {
+    const trigger = document.querySelector('button[aria-haspopup="dialog"][aria-expanded]')
+    if (trigger && trigger.getAttribute('aria-expanded') === 'false') trigger.click()
+    setTimeout(() => {
+      try {
+        const dialog = document.querySelector('[role="dialog"]')
+        const scope = dialog || document
+        const els = scope.querySelectorAll('span, div, a, button, li')
+        for (const el of els) {
+          if (String(el.textContent || '').trim() !== '通知中心') continue
+          if (el.closest('.dsh-cn-set, .dsh-cn-menu, .dsh-cn-wrap')) continue
+          let cell = el
+          for (let i = 0; i < 6 && cell; i++) {
+            const tag = cell.tagName
+            if (tag === 'BUTTON' || tag === 'A' || cell.getAttribute('role') === 'button') {
+              cell.click()
+              return
+            }
+            cell = cell.parentElement
+          }
+        }
+      } catch (_) { /* ignore */ }
+    }, 60)
+  } catch (_) { /* ignore */ }
+}
+
 const KIND_LABEL = { turn: '对话', subagent: '子任务', workflow: 'Workflow', job: '后台任务', approval: '批准', test: '测试' }
 const stopKeyOf = (item) => {
   if (!item || item.kind !== 'turn') return null
@@ -600,8 +630,11 @@ function apply(ctx) {
       }, testCd > 0 ? '播放 (' + testCd + 's)' : '播放')
     ))
     rows.push(React.createElement('div', { key: 'r5', className: 'dsh-cn-row' },
-      React.createElement('span', { className: 'dsh-cn-caption' }, '完整设置在 设置 → 通知中心'),
-      React.createElement('span', null)
+      React.createElement('button', {
+        className: 'dsh-cn-mini primary',
+        style: { flex: 1 },
+        onClick: (e) => { e.stopPropagation(); state.open = false; rerender(); openFullSettings() }
+      }, '完整设置')
     ))
     if (state.status) {
       const cls = state.status.indexOf('✗') === 0 ? 'err' : state.status.indexOf('✓') === 0 ? 'ok' : 'warn'

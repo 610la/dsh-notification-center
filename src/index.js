@@ -53,15 +53,18 @@ export default {
         abortCause = reason.reason && reason.reason.kind ? String(reason.reason.kind) : ''
       }
       const title = TURN_TITLES[rk] || '对话已停止'
-      let body = sid
+      let sessionTitle = ''
       try {
         const st = ctx.get('sessionTitle')
         if (st && session) {
           const snap = st.get(session)
-          if (snap && typeof snap.title === 'string' && snap.title) body = String(snap.title)
+          if (snap && typeof snap.title === 'string' && snap.title) sessionTitle = String(snap.title)
         }
-      } catch (_) { /* keep session id fallback */ }
-      push(sid, 'turn', title, body, { reason: rk, abortCause })
+      } catch (_) { /* keep empty */ }
+      // Title the notification by the session (so you know which conversation),
+      // and put the event description in the body.
+      if (sessionTitle) push(sid, 'turn', sessionTitle, title, { reason: rk, abortCause })
+      else push(sid, 'turn', title, sid, { reason: rk, abortCause })
     })
 
     // The model asks for permission / approval — the user needs to act now.

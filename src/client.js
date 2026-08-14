@@ -999,7 +999,7 @@ const CSS = [
   '.dsh-cn-cat-summary{font-size:12px;font-weight:400;line-height:1.5;color:var(--dsw-alias-label-tertiary,#999);white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis;}',
   '.dsh-cn-cat-chevron{display:inline-flex;align-items:center;justify-content:center;color:var(--dsw-alias-label-secondary,#888);transition:transform .15s;flex:none;}',
   '.dsh-cn-cat-chevron.open{transform:rotate(180deg);}',
-  '.dsh-cn-cat-body{display:flex;flex-direction:column;gap:2px;padding:6px 10px 8px 30px;border-top:1px solid var(--dsw-alias-border-l2,rgba(128,128,128,.45));background:var(--dsw-alias-bg-layer-1,rgba(128,128,128,.05));border-radius:0 0 10px 10px;}',
+  '.dsh-cn-cat-body{display:flex;flex-direction:column;gap:2px;padding:6px 10px 8px 30px;border-top:1px solid var(--dsw-alias-border-l2,rgba(128,128,128,.45));background:rgba(0,0,0,.10);border-radius:0 0 10px 10px;}',
   '.dsh-cn-history{display:flex;flex-direction:column;gap:2px;padding:2px 6px 8px 10px;max-height:240px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--dsw-alias-border-l2,#c9c9c9) transparent;}',
   '.dsh-cn-history::-webkit-scrollbar{width:6px;}',
   '.dsh-cn-history::-webkit-scrollbar-thumb{background:var(--dsw-alias-border-l2,#c9c9c9);border-radius:3px;}',

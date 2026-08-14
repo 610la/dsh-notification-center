@@ -1,4 +1,4 @@
-[中文](README.md) | English
+[中文](https://github.com/610la/dsh-notification-center/blob/main/README.md) | English
 
 # DSH Notification Center
 

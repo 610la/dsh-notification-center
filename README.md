@@ -1,3 +1,5 @@
+[English](README.en.md) | 中文
+
 # DSH 通知中心插件
 
 DSH 的**通知中心**：对话、任务完成后，自动在浏览器弹出**系统通知**并播放**提示音效**——切到别的窗口也不会错过。
@@ -51,3 +53,4 @@ dsh plugin --profile web remove @lyhalal/dsh-notification-center
 ## 链接
 
 - npm 主页：https://www.npmjs.com/package/@lyhalal/dsh-notification-center
+- GitHub 仓库：https://github.com/610la/dsh-notification-center

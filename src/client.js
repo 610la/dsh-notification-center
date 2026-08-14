@@ -271,6 +271,7 @@ const showNotification = (title, body) => {
 const IS_ELECTRON = typeof navigator !== 'undefined' && /Electron/i.test(navigator.userAgent)
 const IS_TAURI = typeof window !== 'undefined' && !!(window.__TAURI__ || window.__TAURI_INTERNALS__)
 const IS_PACKAGED = IS_ELECTRON || IS_TAURI
+const NOTIF_LABEL = IS_PACKAGED ? '系统通知' : '浏览器通知'
 
 // Native OS notification via the host process (node-notifier). Used when running
 // inside a packaged shell, where the renderer's HTML5 Notification is denied —
@@ -576,8 +577,8 @@ function apply(ctx) {
     const rows = []
     rows.push(React.createElement('div', { key: 't', className: 'dsh-cn-menu-title' }, '通知中心'))
     rows.push(React.createElement('div', { key: 'r1', className: 'dsh-cn-row' },
-      React.createElement('span', null, '浏览器通知'),
-      React.createElement(Toggle, { on: settings.notif, label: '浏览器通知开关', onChange: (v) => { settings.notif = v; saveSettings(); rerender() } })
+      React.createElement('span', null, NOTIF_LABEL),
+      React.createElement(Toggle, { on: settings.notif, label: NOTIF_LABEL + '开关', onChange: (v) => { settings.notif = v; saveSettings(); rerender() } })
     ))
     rows.push(React.createElement('div', { key: 'r2', className: 'dsh-cn-row' },
       React.createElement('span', null, '完成音效'),
@@ -676,10 +677,10 @@ function apply(ctx) {
       ),
       open && React.createElement('div', { className: 'dsh-cn-cat-body' },
         React.createElement('div', { className: 'dsh-cn-set-row' },
-          React.createElement('div', { className: 'dsh-cn-set-label' }, '浏览器通知 / 音效'),
+          React.createElement('div', { className: 'dsh-cn-set-label' }, NOTIF_LABEL + ' / 音效'),
           React.createElement('div', { className: 'dsh-cn-set-ctl' },
-            React.createElement('span', { className: 'dsh-cn-caption' }, '浏览器通知'),
-            React.createElement(Toggle, { on: !!conf.notify, label: label + ' 浏览器通知开关', onChange: (v) => apply({ notify: v }) }),
+            React.createElement('span', { className: 'dsh-cn-caption' }, NOTIF_LABEL),
+            React.createElement(Toggle, { on: !!conf.notify, label: label + ' ' + NOTIF_LABEL + '开关', onChange: (v) => apply({ notify: v }) }),
             React.createElement('span', { className: 'dsh-cn-caption', style: { marginLeft: 6 } }, '音效'),
             React.createElement(Toggle, { on: !!conf.soundOn, label: label + ' 音效开关', onChange: (v) => apply({ soundOn: v }) })
           )
@@ -775,7 +776,7 @@ function apply(ctx) {
         denied: IS_PACKAGED ? '✗ 系统通知被应用禁用：请在该桌面应用的设置里开启通知权限' : '✗ 通知被浏览器拒绝，点击「授权」或修改站点设置',
         unsupported: '当前环境不支持系统通知',
         error: '通知发送失败',
-        off: '「浏览器通知」总开关已关闭'
+        off: '「' + NOTIF_LABEL + '」总开关已关闭'
       }
       setTestMsg(map[status] || status)
       rerender()
@@ -811,8 +812,8 @@ function apply(ctx) {
       ),
       React.createElement('div', { className: 'dsh-cn-set-group' },
         React.createElement('div', { className: 'dsh-cn-set-group-title' }, '总开关'),
-        React.createElement(Row, { label: '浏览器通知', hint: '总开关，需要浏览器授权' },
-          React.createElement(Toggle, { on: settings.notif, label: '浏览器通知', onChange: (v) => set({ notif: v }) })
+        React.createElement(Row, { label: NOTIF_LABEL, hint: '总开关，需要授权' },
+          React.createElement(Toggle, { on: settings.notif, label: NOTIF_LABEL, onChange: (v) => set({ notif: v }) })
         ),
         React.createElement(Row, { label: '完成音效', hint: '总开关' },
           React.createElement(Toggle, { on: settings.sound, label: '完成音效', onChange: (v) => set({ sound: v }) })
@@ -820,7 +821,7 @@ function apply(ctx) {
         React.createElement(Row, { label: '通知权限', hint: '当前: ' + permText },
           React.createElement('button', { className: 'dsh-cn-mini', onClick: grant }, '授权')
         ),
-        React.createElement(Row, { label: '浏览器通知测试', hint: testMsg || '发送一条测试通知并播放对话音效' },
+        React.createElement(Row, { label: NOTIF_LABEL + '测试', hint: testMsg || '发送一条测试通知并播放对话音效' },
           React.createElement('button', {
             className: 'dsh-cn-mini primary',
             disabled: testCd > 0,

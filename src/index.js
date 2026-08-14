@@ -153,7 +153,7 @@ export default {
               // renderer), so it works even when the shell denies web permission.
               const mod = await import('node-notifier')
               const notifier = mod.default || mod
-              notifier.notify({ title, message: body, sound: false })
+              notifier.notify({ title, message: body, sound: false, appName: 'DeepSeek Harness' })
               res.writeHead(200, { 'content-type': 'application/json; charset=utf-8' })
               res.end(JSON.stringify({ ok: true }))
             } catch (e) {

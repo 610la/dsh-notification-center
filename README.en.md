@@ -7,6 +7,7 @@ A **notification center** for DSH: when a conversation or task finishes, it pops
 ## Features
 
 - 🔔 **Browser system notifications** + **sound alerts** (21 built-in sounds, all replaceable)
+- 🖥️ **Native OS notifications**: when packaged as a desktop app (Electron/Tauri), it automatically uses native notifications from the host process, unaffected by shell permission restrictions
 - 🎚️ **Per-event configuration**: notification toggle, sound type, custom sound file/URL, volume
 - 🚫 Manual stop/interrupt of generation is **silent by default**; errors, token limits and blocks are notified
 - ⏰ Instant alert when the model requests **approval** (not subject to cooldown)
@@ -38,9 +39,15 @@ Restart DSH and the browser side loads automatically — no extra configuration.
   - **Stop reasons**: error, max tokens exceeded, blocked, other, manual stop/interrupt
 - Expand any category to configure: **sound type** (21 built-in / silent / custom file / custom URL), **volume**, **toggle** — the selected sound plays immediately for preview
 
+## Native notifications
+
+- In a **browser**, it uses web system notifications (grant permission once via the address bar)
+- Packaged as a **desktop app** (Electron/Tauri), it automatically uses **native notifications from the host process** (Windows notification center / macOS Notification Center / Linux notify-send), shown as `DeepSeek Harness`, with **no browser-permission dependency** — it works even when the shell blocks web notifications
+- In packaged environments, the "notification permission / grant" row is hidden automatically (native notifications need no browser permission)
+
 ## Notes
 
-- On first use, **allow browser notification permission**: click "Grant" or "Test" and accept the browser prompt
+- In a browser, **allow notification permission** on first use: click "Grant" or "Test"
 - Sounds play only after **at least one click on the page** (browser autoplay policy)
 - Manual stop/interrupt is **silent by default**; enable it under "Stop reasons → Manual stop/interrupt" if you want it
 

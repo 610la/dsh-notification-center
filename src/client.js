@@ -302,6 +302,9 @@ const handleItem = (item) => {
   if (!item) return
   const key = categoryOf(item)
   const conf = settings.catConf && settings.catConf[key]
+  // Always record into the recent-events list, regardless of notify/sound/cooldown.
+  history.push({ kind: item.kind, title: item.title, body: item.body, at: item.at || Date.now() })
+  if (history.length > 20) history.shift()
   if (item.kind !== 'test') {
     if (!conf || (conf.notify === false && conf.soundOn === false)) return
   }
@@ -315,8 +318,6 @@ const handleItem = (item) => {
     if (now - lastNotifyAt < (Number(settings.cooldownMs) || 0)) return
   }
   lastNotifyAt = Date.now()
-  history.push({ kind: item.kind, title: item.title, body: item.body, at: item.at || Date.now() })
-  if (history.length > 20) history.shift()
   if (settings.notif && (!conf || conf.notify !== false)) {
     if (IS_PACKAGED) nativeNotify(item.title, item.body)
     else showNotification(item.title, item.body)
@@ -791,25 +792,25 @@ function apply(ctx) {
       [0, '无'], [2000, '2 秒'], [5000, '5 秒'], [10000, '10 秒'], [30000, '30 秒']
     ]
     const kindRows = [
-      ['turn', '对话完成', '对话自然生成完成（默认音效: 成功音）'],
-      ['subagent', '子任务完成', '子代理结束（默认音效: 提示叮）'],
-      ['workflow', 'Workflow 完成', '多代理工作流结束（默认音效: 欢呼）'],
-      ['job', '后台任务完成', '后台命令结束（默认音效: 清脆弹响）'],
-      ['approval', '等待批准', '模型请求权限/批准时，需要你操作（默认音效: 闹钟）']
+      ['turn', '对话完成', '对话自然生成完成'],
+      ['subagent', '子任务完成', '子代理结束'],
+      ['workflow', 'Workflow 完成', '多代理工作流结束'],
+      ['job', '后台任务完成', '后台命令结束'],
+      ['approval', '等待批准', '模型请求权限/批准时，需要你操作']
     ]
     const stopRows = [
-      ['error', '报错停止', '生成过程中出错（默认音效: 错误音）'],
-      ['max-tokens', '超长截断', '达到最大长度限制（默认音效: 电子哔声）'],
-      ['blocked', '被阻塞', '系统拦截未开始生成（默认音效: 嗖声）'],
-      ['other', '其他原因停止', '非手动取消的其他停止（默认音效: 马林巴）'],
-      ['manual', '手动停止/打断', '你点击停止/打断生成（默认不通知，音效: 柔和）']
+      ['error', '报错停止', '生成过程中出错'],
+      ['max-tokens', '超长截断', '达到最大长度限制'],
+      ['blocked', '被阻塞', '系统拦截未开始生成'],
+      ['other', '其他原因停止', '非手动取消的其他停止'],
+      ['manual', '手动停止/打断', '你点击停止/打断生成（默认不通知）']
     ]
     return React.createElement('div', { className: 'dsh-cn-set' },
       React.createElement('div', { className: 'dsh-cn-set-head' },
         React.createElement('span', { className: 'dsh-cn-set-head-icon' }, React.createElement(BellIcon, { size: 18 })),
         React.createElement('div', null,
           React.createElement('div', { className: 'dsh-cn-set-title' }, '通知中心'),
-          React.createElement('div', { className: 'dsh-cn-set-sub' }, '每个事件已预配匹配音效（对话=成功音、报错=错误音、批准=闹钟…），可随时修改')
+          React.createElement('div', { className: 'dsh-cn-set-sub' }, '每个事件可独立配置通知开关与音效')
         )
       ),
       React.createElement('div', { className: 'dsh-cn-set-group' },

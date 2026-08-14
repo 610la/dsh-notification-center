@@ -759,7 +759,7 @@ function apply(ctx) {
               value: Math.round(vol * 100),
               onChange: (e) => apply({ volume: Number(e.target.value) / 100 })
             }),
-            React.createElement('span', { className: 'dsh-cn-caption' }, Math.round(vol * 100) + '%'),
+            React.createElement('span', { className: 'dsh-cn-caption', style: { minWidth: '40px', textAlign: 'right' } }, Math.round(vol * 100) + '%'),
             React.createElement('button', { className: 'dsh-cn-mini primary', onClick: preview }, '试听')
           )
         ),
@@ -978,9 +978,9 @@ const CSS = [
   '.dsh-cn-ds-item:hover{background:var(--dsw-alias-interactive-bg-hover,rgba(0,0,0,.06));}',
   '.dsh-cn-ds-item.sel{color:#3b82f6;font-weight:600;}',
   '.dsh-cn-input{padding:0 12px;height:34px;border:1px solid var(--dsw-alias-border-l2,rgba(128,128,128,.45));border-radius:8px;background:var(--dsw-alias-bg-layer-3,rgba(128,128,128,.04));color:var(--dsw-alias-label-primary,#222);font-size:13px;line-height:1.5;width:220px;box-sizing:border-box;}',
-  '.dsh-cn-range{-webkit-appearance:none;appearance:none;height:4px;border-radius:2px;background:var(--dsw-alias-border-l2,#c9c9c9);outline:none;cursor:pointer;width:100px;flex:none;}',
-  '.dsh-cn-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:14px;height:14px;border-radius:50%;background:#3b82f6;cursor:pointer;box-shadow:0 0 0 2px rgba(255,255,255,.6);}',
-  '.dsh-cn-range::-moz-range-thumb{width:14px;height:14px;border:none;border-radius:50%;background:#3b82f6;cursor:pointer;box-shadow:0 0 0 2px rgba(255,255,255,.6);}',
+  '.dsh-cn-range{-webkit-appearance:none;appearance:none;height:4px;border-radius:2px;background:color-mix(in srgb, var(--dsw-alias-label-primary,#222) 22%, transparent);outline:none;cursor:pointer;width:100px;flex:none;}',
+  '.dsh-cn-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:14px;height:14px;border-radius:50%;background:#3b82f6;cursor:pointer;box-shadow:0 0 0 2px color-mix(in srgb, var(--dsw-alias-bg-layer-2,#fff) 50%, transparent);}',
+  '.dsh-cn-range::-moz-range-thumb{width:14px;height:14px;border:none;border-radius:50%;background:#3b82f6;cursor:pointer;box-shadow:0 0 0 2px color-mix(in srgb, var(--dsw-alias-bg-layer-2,#fff) 50%, transparent);}',
   '.dsh-cn-set{display:flex;flex-direction:column;gap:18px;padding:4px 2px;max-width:680px;font-family:var(--dsw-font-family,-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",Helvetica,Arial,sans-serif);}',
   '.dsh-cn-set-head{display:flex;align-items:center;gap:10px;}',
   '.dsh-cn-set-head-icon{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:10px;background:var(--dsw-alias-bg-layer-1,rgba(128,128,128,.08));color:var(--dsw-alias-brand-primary,#3b82f6);flex:none;}',
@@ -998,7 +998,7 @@ const CSS = [
   '.dsh-cn-cat-summary{font-size:12px;font-weight:400;line-height:1.5;color:var(--dsw-alias-label-tertiary,#999);white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis;}',
   '.dsh-cn-cat-chevron{display:inline-flex;align-items:center;justify-content:center;color:var(--dsw-alias-label-secondary,#888);transition:transform .15s;flex:none;}',
   '.dsh-cn-cat-chevron.open{transform:rotate(180deg);}',
-  '.dsh-cn-cat-body{display:flex;flex-direction:column;gap:2px;padding:6px 10px 8px 30px;border-top:1px solid var(--dsw-alias-border-l2,rgba(128,128,128,.45));background:rgba(0,0,0,.10);border-radius:0 0 10px 10px;}',
+  '.dsh-cn-cat-body{display:flex;flex-direction:column;gap:2px;padding:6px 10px 8px 30px;border-top:1px solid var(--dsw-alias-border-l2,rgba(128,128,128,.45));background:color-mix(in srgb, var(--dsw-alias-label-primary,#222) 8%, transparent);border-radius:0 0 10px 10px;}',
   '.dsh-cn-history{display:flex;flex-direction:column;gap:2px;padding:2px 6px 8px 10px;max-height:240px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--dsw-alias-border-l2,#c9c9c9) transparent;}',
   '.dsh-cn-history::-webkit-scrollbar{width:6px;}',
   '.dsh-cn-history::-webkit-scrollbar-thumb{background:var(--dsw-alias-border-l2,#c9c9c9);border-radius:3px;}',

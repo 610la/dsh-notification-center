@@ -10,22 +10,22 @@ DSH 的**通知中心**：对话、任务完成后，自动在浏览器弹出**�
 - ⏰ 模型请求权限/批准时**立即提醒**（不受冷却限制）
 - 💾 设置自动保存，刷新不丢失
 
-## 安装
+## 安装（DSH）
 
-在 DSH 项目目录执行：
+一条命令即可（推荐）：
 
 ```bash
-npm install @lyhalal/dsh-notification-center
-```
-
-在 host 的 `cordis.yml` 的 `plugins` 下加一行：
-
-```yaml
-plugins:
-  - from: '@lyhalal/dsh-notification-center'
+dsh plugin --profile web add @lyhalal/dsh-notification-center
 ```
 
 重启 DSH 后生效，浏览器端自动加载，无需其他配置。
+
+> 手动方式（等价）：在 DSH 项目目录 `npm install @lyhalal/dsh-notification-center`，
+> 并在 host 的 `cordis.yml` 的 `plugins` 下加一行：
+> ```yaml
+> plugins:
+>   - from: '@lyhalal/dsh-notification-center'
+> ```
 
 ## 使用
 
@@ -44,8 +44,9 @@ plugins:
 
 ## 卸载
 
-1. 从 `cordis.yml` 移除 `@lyhalal/dsh-notification-center` 这一行
-2. 执行 `npm uninstall @lyhalal/dsh-notification-center`
+```bash
+dsh plugin --profile web remove @lyhalal/dsh-notification-center
+```
 
 ## 链接
 

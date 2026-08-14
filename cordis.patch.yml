@@ -1,0 +1,7 @@
+# dsh-notification-center bundle patch: insert the host plugin row into the
+# composed profile. The package's `main` (lib/index.js) is the cordis plugin
+# that listens for completion events and serves /dsh-notification-center/poll;
+# the browser half is discovered automatically via the `dsh.client` declaration.
+- insert:
+    - id: dsh-notification-center
+      name: '@lyhalal/dsh-notification-center'

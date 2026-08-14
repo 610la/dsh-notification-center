@@ -272,6 +272,17 @@ const IS_ELECTRON = typeof navigator !== 'undefined' && /Electron/i.test(navigat
 const IS_TAURI = typeof window !== 'undefined' && !!(window.__TAURI__ || window.__TAURI_INTERNALS__)
 const IS_PACKAGED = IS_ELECTRON || IS_TAURI
 
+// Native OS notification via the host process (node-notifier). Used when running
+// inside a packaged shell, where the renderer's HTML5 Notification is denied —
+// the host shows a real out-of-app system notification instead.
+const nativeNotify = (title, body) => {
+  try {
+    const url = '/dsh-notification-center/notify?title=' + encodeURIComponent(title || '') + '&body=' + encodeURIComponent(body || '')
+    fetch(url).catch(() => {})
+    return 'native'
+  } catch (_) { return 'error' }
+}
+
 const KIND_LABEL = { turn: '对话', subagent: '子任务', workflow: 'Workflow', job: '后台任务', approval: '批准', test: '测试' }
 const stopKeyOf = (item) => {
   if (!item || item.kind !== 'turn') return null
@@ -305,7 +316,10 @@ const handleItem = (item) => {
   lastNotifyAt = Date.now()
   history.push({ kind: item.kind, title: item.title, body: item.body, at: item.at || Date.now() })
   if (history.length > 20) history.shift()
-  if (settings.notif && (!conf || conf.notify !== false)) showNotification(item.title, item.body)
+  if (settings.notif && (!conf || conf.notify !== false)) {
+    if (IS_PACKAGED) nativeNotify(item.title, item.body)
+    else showNotification(item.title, item.body)
+  }
   if (settings.sound && (!conf || conf.soundOn !== false)) {
     if (conf) playCat(conf)
     else playTone('chime', 1)
@@ -541,11 +555,12 @@ function apply(ctx) {
       }
       let status = 'off'
       if (settings.notif) {
-        status = showNotification('通知中心测试', '来自通知插件的测试')
+        status = IS_PACKAGED ? nativeNotify('通知中心测试', '来自通知插件的测试') : showNotification('通知中心测试', '来自通知插件的测试')
         history.push({ kind: 'test', title: '通知中心测试', body: '手动测试', at: Date.now() })
       }
       const map = {
         granted: '✓ 通知已发送，音效已播放',
+        native: '✓ 系统通知已发送（应用外），音效已播放',
         requested: '已请求通知权限，请在浏览器弹窗中点击允许；音效已播放',
         denied: IS_PACKAGED ? '✗ 系统通知被应用禁用（音效已播放）：请在该桌面应用的设置里开启通知权限' : '✗ 通知被浏览器拒绝（音效已播放）；请点击上方「授权」或修改站点设置',
         unsupported: '当前环境不支持系统通知（音效已播放）',
@@ -751,10 +766,11 @@ function apply(ctx) {
       }
       let status = 'off'
       if (settings.notif) {
-        status = showNotification('通知中心测试', '来自通知插件的测试通知')
+        status = IS_PACKAGED ? nativeNotify('通知中心测试', '来自通知插件的测试通知') : showNotification('通知中心测试', '来自通知插件的测试通知')
       }
       const map = {
         granted: '✓ 通知已发送',
+        native: '✓ 系统通知已发送（应用外）',
         requested: '已请求权限，请在浏览器弹窗中允许',
         denied: IS_PACKAGED ? '✗ 系统通知被应用禁用：请在该桌面应用的设置里开启通知权限' : '✗ 通知被浏览器拒绝，点击「授权」或修改站点设置',
         unsupported: '当前环境不支持系统通知',

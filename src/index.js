@@ -132,14 +132,37 @@ export default {
       }))
     }
 
-    // JSON poll endpoint the browser client fetches every ~1.5s.
+    // JSON poll endpoint the browser client fetches every ~1.5s, plus a native
+    // notification endpoint the client calls when it runs inside a packaged
+    // shell (Electron/Tauri) where the HTML5 Notification permission is denied.
     // GET /dsh-notification-center/poll?session=<sessionId>&after=<lastId>
+    // GET /dsh-notification-center/notify?title=<title>&body=<body>
     ctx.effect(() => ctx.webServer.register({
       kind: 'prefix',
       path: '/dsh-notification-center',
-      handler: (req, res) => {
+      handler: async (req, res) => {
         try {
           const url = new URL(req.url || '/', 'http://localhost')
+          const pathname = url.pathname
+
+          if (pathname === '/dsh-notification-center/notify') {
+            const title = url.searchParams.get('title') || '通知中心'
+            const body = url.searchParams.get('body') || ''
+            try {
+              // Native OS notification from the host process (outside the app's
+              // renderer), so it works even when the shell denies web permission.
+              const mod = await import('node-notifier')
+              const notifier = mod.default || mod
+              notifier.notify({ title, message: body, sound: false })
+              res.writeHead(200, { 'content-type': 'application/json; charset=utf-8' })
+              res.end(JSON.stringify({ ok: true }))
+            } catch (e) {
+              res.writeHead(500, { 'content-type': 'application/json; charset=utf-8' })
+              res.end(JSON.stringify({ ok: false, error: String(e && e.message ? e.message : e) }))
+            }
+            return
+          }
+
           const session = url.searchParams.get('session') || ''
           const after = Number(url.searchParams.get('after')) || 0
           const items = []

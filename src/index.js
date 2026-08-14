@@ -149,8 +149,9 @@ export default {
             const title = url.searchParams.get('title') || '通知中心'
             const body = url.searchParams.get('body') || ''
             try {
-              // Native OS notification from the host process (outside the app's
-              // renderer), so it works even when the shell denies web permission.
+              // Native OS notification from the host process, unified across
+              // Windows (SnoreToast), macOS (terminal-notifier) and Linux
+              // (notify-send); appName sets the displayed app name on all three.
               const mod = await import('node-notifier')
               const notifier = mod.default || mod
               notifier.notify({ title, message: body, sound: false, appName: 'DeepSeek Harness' })

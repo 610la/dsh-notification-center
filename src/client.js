@@ -584,10 +584,12 @@ function apply(ctx) {
       React.createElement('span', null, '完成音效'),
       React.createElement(Toggle, { on: settings.sound, label: '完成音效开关', onChange: (v) => { settings.sound = v; saveSettings(); rerender() } })
     ))
-    rows.push(React.createElement('div', { key: 'r3', className: 'dsh-cn-row' },
-      React.createElement('span', null, '通知权限: ' + permText),
-      React.createElement('button', { className: 'dsh-cn-mini', onClick: (e) => { e.stopPropagation(); grant() } }, '授权')
-    ))
+    if (!IS_PACKAGED) {
+      rows.push(React.createElement('div', { key: 'r3', className: 'dsh-cn-row' },
+        React.createElement('span', null, '通知权限: ' + permText),
+        React.createElement('button', { className: 'dsh-cn-mini', onClick: (e) => { e.stopPropagation(); grant() } }, '授权')
+      ))
+    }
     rows.push(React.createElement('div', { key: 'r4', className: 'dsh-cn-row' },
       React.createElement('span', null, '测试'),
       React.createElement('button', {
@@ -818,7 +820,7 @@ function apply(ctx) {
         React.createElement(Row, { label: '完成音效', hint: '总开关' },
           React.createElement(Toggle, { on: settings.sound, label: '完成音效', onChange: (v) => set({ sound: v }) })
         ),
-        React.createElement(Row, { label: '通知权限', hint: '当前: ' + permText },
+        !IS_PACKAGED && React.createElement(Row, { label: '通知权限', hint: '当前: ' + permText },
           React.createElement('button', { className: 'dsh-cn-mini', onClick: grant }, '授权')
         ),
         React.createElement(Row, { label: NOTIF_LABEL + '测试', hint: testMsg || '发送一条测试通知并播放对话音效' },

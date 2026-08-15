@@ -101,19 +101,35 @@ export default {
       return next()
     })
 
-    // Subagent (subtask) settled — attribute to its parent session.
-    ctx.on('subagent/end', (info) => {
-      if (!info) return
+    // Subagent (subtask) lifecycle. The parent session id must be captured at
+    // `subagent/start`, while the child is guaranteed live: by the time
+    // `subagent/end` fires the child may already be disposed (continuable
+    // children settle after ownership release), so resolving it then fails.
+    // Correlate start → end by the shared `runId`, mirroring the subagent
+    // service's own start/end pairing. The correct parent link is the child
+    // session header (`session.header.parentSession`), not `session.meta`.
+    const subagentParents = new Map()
+    ctx.on('subagent/start', (info) => {
+      if (!info || !info.runId) return
       let sid = ''
       try {
         const agents = ctx.get('agents')
         if (agents && typeof agents.get === 'function' && info.id) {
           const child = agents.get(info.id)
-          if (child && child.session && child.session.meta && child.session.meta.parentSession) {
-            sid = String(child.session.meta.parentSession)
+          if (child && child.session && child.session.header && child.session.header.parentSession) {
+            sid = String(child.session.header.parentSession)
           }
         }
       } catch (_) { /* keep fallback */ }
+      if (sid) subagentParents.set(info.runId, sid)
+    })
+    ctx.on('subagent/end', (info) => {
+      if (!info) return
+      let sid = ''
+      if (info.runId && subagentParents.has(info.runId)) {
+        sid = subagentParents.get(info.runId)
+        subagentParents.delete(info.runId)
+      }
       if (!sid && !ourRunning) return
       const reason = info.stopReason || 'settled'
       push(sid, 'subagent', '子任务完成', '子代理 ' + String(info.provider || 'subagent') + ' · ' + String(reason))

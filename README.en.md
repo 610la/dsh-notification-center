@@ -2,6 +2,8 @@ English | [中文](https://github.com/610la/dsh-notification-center/blob/main/RE
 
 # DSH Notification Center
 
+> ⚠️ This is a third-party community plugin, **not an official DeepSeek Harness product**.
+
 A **notification center** for DSH: when a conversation or task finishes, it pops a **browser system notification** and plays a **sound alert** — so you never miss a completed task, even in another window.
 
 ## Features

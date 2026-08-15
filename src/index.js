@@ -19,17 +19,6 @@ export default {
       if (queue.length > MAX_QUEUE) queue.shift()
     }
 
-    let ourRunning = false
-
-    // Track agent running state (used to attribute subagent completions).
-    ctx.on('agent/status', (payload) => {
-      if (!payload) return
-      const agent = payload.agent
-      const sid = agent && agent.id ? String(agent.id) : ''
-      if (payload.status === 'running') ourRunning = true
-      else if (payload.status === 'idle') ourRunning = false
-    })
-
     // Turn ended: carry the durable stop reason so the client can decide
     // whether to notify (manual stop / interrupt are silent by default;
     // completion / error / max-tokens / blocked notify).
@@ -114,10 +103,23 @@ export default {
       let sid = ''
       try {
         const agents = ctx.get('agents')
-        if (agents && typeof agents.get === 'function' && info.id) {
-          const child = agents.get(info.id)
-          if (child && child.session && child.session.header && child.session.header.parentSession) {
-            sid = String(child.session.header.parentSession)
+        if (agents) {
+          // Local child: read the child session's parent link. The child is
+          // guaranteed live here — subagent/start fires synchronously inside
+          // the parent's delegation, before any disposal.
+          if (typeof agents.get === 'function' && info.id) {
+            const child = agents.get(info.id)
+            if (child && child.session && child.session.header && child.session.header.parentSession) {
+              sid = String(child.session.header.parentSession)
+            }
+          }
+          // Remote child (local: false): its id is a parent-namespaced run id,
+          // not a session in this process, so agents.get() misses. Fall back to
+          // the initiating (parent) agent, which is the agent currently running
+          // the delegation that just published this start.
+          if (!sid && typeof agents.currentInitiator === 'function') {
+            const initiator = agents.currentInitiator()
+            if (initiator && initiator.id) sid = String(initiator.id)
           }
         }
       } catch (_) { /* keep fallback */ }
@@ -130,7 +132,7 @@ export default {
         sid = subagentParents.get(info.runId)
         subagentParents.delete(info.runId)
       }
-      if (!sid && !ourRunning) return
+      if (!sid) return
       const reason = info.stopReason || 'settled'
       push(sid, 'subagent', '子任务完成', '子代理 ' + String(info.provider || 'subagent') + ' · ' + String(reason))
     })

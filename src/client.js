@@ -314,7 +314,7 @@ const openFullSettings = () => {
   } catch (_) { /* ignore */ }
 }
 
-const KIND_LABEL = { turn: '对话', subagent: '子任务', workflow: 'Workflow', job: '后台任务', approval: '批准', test: '测试' }
+const KIND_LABEL = { turn: '对话', subagent: '子任务', workflow: 'Workflow', job: '后台任务', approval: '批准', test: '测试', error: '报错', 'max-tokens': '超长', blocked: '阻塞', other: '其他', manual: '手动' }
 const stopKeyOf = (item) => {
   if (!item || item.kind !== 'turn') return null
   let k = item.reason || 'other'
@@ -333,7 +333,9 @@ const handleItem = (item) => {
   const key = categoryOf(item)
   const conf = settings.catConf && settings.catConf[key]
   // Always record into the recent-events list, regardless of notify/sound/cooldown.
-  history.push({ kind: item.kind, title: item.title, body: item.body, at: item.at || Date.now() })
+  // Use the resolved category (not the raw kind) so stop reasons show a precise
+  // label (报错/超长/阻塞/其他/手动) instead of all collapsing to "对话".
+  history.push({ kind: key, title: item.title, body: item.body, at: item.at || Date.now() })
   if (history.length > 20) history.shift()
   if (item.kind !== 'test') {
     if (!conf || (conf.notify === false && conf.soundOn === false)) return

@@ -43,8 +43,24 @@ export default {
     }
     ctx.on('session/event', (session, event) => {
       if (!session || !event) return
-      if (event.type !== 'turn/end') return
       const sid = session.id ? String(session.id) : ''
+
+      // The model calls ask_user_question → it blocks until the user answers.
+      // Notify immediately so the user knows a question is waiting.
+      if (event.type === 'tool/call' && event.data && event.data.name === 'ask_user_question') {
+        let body = '模型正在向你提问'
+        try {
+          const args = JSON.parse(event.data.arguments || '{}')
+          if (args && Array.isArray(args.questions) && args.questions.length) {
+            const q = args.questions[0]
+            body = String(q.question || q.header || '模型正在向你提问')
+          }
+        } catch (_) { /* keep fallback */ }
+        push(sid, 'approval', '需要你的回答', body)
+        return
+      }
+
+      if (event.type !== 'turn/end') return
       const data = event.data || {}
       const reason = data.reason || {}
       const rk = reason.kind ? String(reason.kind) : 'other'
